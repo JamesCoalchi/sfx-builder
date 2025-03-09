@@ -9,7 +9,7 @@ def pack(files, run_after_unpack, output_name='unpacker'):
             print("No files to pack.")
             return
 
-        rau = os.path.basename(run_after_unpack) if run_after_unpack else ""
+        rau = [os.path.basename(file) for file in run_after_unpack] if run_after_unpack else []
 
         file_data = []
         total = len(files)
@@ -34,7 +34,7 @@ import subprocess
 import ctypes
 
 FILE_DATA = {file_data}
-RUN_AFTER = "{rau}"
+RUN_AFTER = {rau}
 
 def show_message_box(title, message, is_error=False):
     style = 0x10 if is_error else 0x40  # 0x10 for error icon, 0x40 for info icon
@@ -67,21 +67,23 @@ def main():
         )
 
         if RUN_AFTER:
-            file_to_run = os.path.join(extract_dir, RUN_AFTER)
-            if os.path.exists(file_to_run):
-                ext = os.path.splitext(file_to_run)[1].lower()
-                
-                if ext == '.py':
-                    subprocess.Popen(['python', file_to_run], cwd=extract_dir)
-                elif ext in ['.exe', '.bat', '.cmd']:
-                    subprocess.Popen([file_to_run], cwd=extract_dir)
-                else:
-                    if sys.platform == 'win32':
-                        os.startfile(file_to_run)
-                    elif sys.platform == 'darwin':  # macOS
-                        subprocess.Popen(['open', file_to_run])
-                    else:  # Linux
-                        subprocess.Popen(['xdg-open', file_to_run])
+        	for ftrn in RUN_AFTER:
+        		file_to_run = os.path.join(extract_dir, ftrn)
+        		if os.path.exists(file_to_run):
+        			ext = os.path.splitext(file_to_run)[1].lower()
+
+        			if ext == '.py':
+        				subprocess.Popen(['python', file_to_run], cwd=extract_dir)
+        			elif ext in ['.exe', '.bat', '.cmd']:
+        				subprocess.Popen([file_to_run], cwd=extract_dir)
+        			else:
+        				if sys.platform == 'win32':
+        					os.startfile(file_to_run)
+        				elif sys.platform == 'darwin':  # macOS
+        					subprocess.Popen(['open', file_to_run])
+        				else:  # Linux
+        					subprocess.Popen(['xdg-open', file_to_run])
+
     except Exception as e:
         show_message_box("Error", f"An error occurred: {{e}}", is_error=True)
 
@@ -110,34 +112,3 @@ if __name__ == "__main__":
             print(f"Failed to create executable: {e}")
     except Exception as e:
         print(e)
-
-def main():
-    files = []
-    while True:
-        file_path = input("Enter file path (Blank if finished):\n>>> ").strip('"')
-        if not file_path:
-            break
-        if os.path.exists(file_path):
-            files.append(file_path)
-            print(f"Added file: {file_path}")
-        else:
-            print(f"File not found: {file_path}")
-
-    if not files:
-        print("No files to pack.")
-        return
-
-    print(f"Files: {files}")
-    output_name = input("Enter output name (Not including file extensions):\n>>> ").strip()
-    if not output_name:
-        output_name = 'unpacker'
-
-    run_after_unpack = input("Enter the file to run after unpacking (Blank if none):\n>>> ").strip('"')
-    if run_after_unpack and not os.path.exists(run_after_unpack):
-        print(f"File to run after unpacking not found: {run_after_unpack}")
-        return
-
-    pack(files, run_after_unpack, output_name)
-
-if __name__ == "__main__":
-    main()
