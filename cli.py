@@ -10,7 +10,7 @@ filesToPack = []
 def get_files():
 	files = []
 	while 1:
-		file = input("Enter file path (Blank if finished): \n>>> ").strip('"')
+		file = input("Input file path (Blank if finished): \n>>> ").strip('"')
 		if file:
 			if os.path.isfile(file):
 				print("Added file: " + file)
@@ -26,8 +26,9 @@ def get_files():
 
 def main():
 	filesToPack = get_files()
-	output_name = str(input("Enter output name. (Not including file extensions):\n>>> ")).split('.')[0]
-	run_after_unpack = str(input("Input file name to run after unpacking. (Including file extensions):\n>>> "))
+	output_name = str(input("Input output name. (Not including file extensions):\n>>> ")).split('.')[0]
+	run_after_unpack = [name.strip() for name in str(input("Input file names to run after unpacking (separated by commas, including extensions):\n>>> ")).split(",")]
+	print(run_after_unpack)
 	packer.pack(filesToPack, run_after_unpack, output_name)
 
 if __name__ == '__main__':
