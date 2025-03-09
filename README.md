@@ -1,6 +1,7 @@
 # sfx-builder
 
 Pack file / files into a standalone executable.
+
 ## Requirements
 - Python
 - PyInstaller
